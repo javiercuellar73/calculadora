@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fracciones Plus Pro</title>
+    <title>Fracciones Plus Pro v3.1</title>
     
     <link rel="icon" type="image/png" href="icono.png?v=2">
     <link rel="apple-touch-icon" href="icono.png?v=2">
@@ -61,6 +61,8 @@
 
         button { height: 48px; border: 1px solid #888; border-radius: 8px; background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); box-shadow: 0 4px 0 #7f8c8d; font-size: 1.2rem; font-weight: bold; color: #2c3e50; cursor: pointer; transition: transform 0.05s; position: relative; }
         button:active { transform: translateY(3px); box-shadow: 0 1px 0 #7f8c8d; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+
         .btn-red { background: linear-gradient(to bottom, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 0 #962d22; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); color: white; box-shadow: 0 4px 0 #1c5982; }
         .operators-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px 10px 0; }
@@ -95,7 +97,9 @@
                 <button onclick="action('press', 'w', 1)">1</button><button onclick="action('press', 'w', 2)">2</button><button onclick="action('press', 'w', 3)">3</button>
                 <button onclick="action('press', 'w', 4)">4</button><button onclick="action('press', 'w', 5)">5</button><button onclick="action('press', 'w', 6)">6</button>
                 <button onclick="action('press', 'w', 7)">7</button><button onclick="action('press', 'w', 8)">8</button><button onclick="action('press', 'w', 9)">9</button>
-                <button style="grid-column: span 3;" onclick="action('press', 'w', 0)">0</button>
+                <button id="btn-dot" onclick="action('pressDot')" disabled>.</button>
+                <button onclick="action('press', 'w', 0)">0</button>
+                <button style="visibility: hidden;"> </button>
             </div>
         </div>
         <div class="right-column">
@@ -130,7 +134,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "3.0";
+    const APP_VERSION = "3.1";
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
     
     let currentInput = { w: '0', n: '', d: '' };
@@ -140,12 +144,7 @@
         if ("vibrate" in navigator) navigator.vibrate(20);
         clickSound.currentTime = 0;
         clickSound.play().catch(() => {}); 
-        if (fnName === 'press') press(...args);
-        if (fnName === 'back') back(...args);
-        if (fnName === 'clearAll') clearAll();
-        if (fnName === 'toggleSign') toggleSign();
-        if (fnName === 'handleOp') handleOp(...args);
-        if (fnName === 'solve') solve();
+        window[fnName](...args);
     }
 
     document.addEventListener("DOMContentLoaded", () => { document.getElementById("app-version").innerText = "v" + APP_VERSION; });
@@ -153,6 +152,7 @@
     function toggleDecimal() {
         isDecimalMode = !isDecimalMode;
         document.getElementById('btn-dec').classList.toggle('active', isDecimalMode);
+        document.getElementById('btn-dot').disabled = !isDecimalMode;
         updateDisplay();
     }
 
@@ -176,33 +176,46 @@
         return html;
     }
 
-    function press(part, val) { if (justSolved) { clearAll(); justSolved = false; } if (currentInput[part] === '0') currentInput[part] = val.toString(); else currentInput[part] += val.toString(); updateDisplay(); }
-    function back(part) { if (justSolved) { clearAll(); justSolved = false; return; } currentInput[part] = currentInput[part].slice(0, -1); if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); updateDisplay(); }
+    function press(part, val) { 
+        if (justSolved) { clearAll(); justSolved = false; } 
+        if (currentInput[part] === '0' && val !== '.') currentInput[part] = val.toString(); 
+        else currentInput[part] += val.toString(); 
+        updateDisplay(); 
+    }
+
+    function pressDot() {
+        if (!isDecimalMode || currentInput.w.includes('.')) return;
+        currentInput.w += '.';
+        updateDisplay();
+    }
+
+    function back(part) { 
+        if (justSolved) { clearAll(); justSolved = false; return; } 
+        currentInput[part] = currentInput[part].slice(0, -1); 
+        if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); 
+        updateDisplay(); 
+    }
+
     function toggleSign() { if (justSolved) justSolved = false; sign *= -1; updateDisplay(); }
+
     function clearAll() { currentInput = { w: '0', n: '', d: '' }; storedValue = null; storedDisplayHTML = ""; activeOperator = null; sign = 1; justSolved = false; document.getElementById('process-val').innerHTML = ""; updateDisplay(); document.getElementById('round-8').innerText = "-"; document.getElementById('round-16').innerText = "-"; document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op')); }
 
     function updateDisplay(htmlOverride = null) { 
         const main = document.getElementById('main-val'); 
         if (htmlOverride) { main.innerHTML = htmlOverride; return; } 
+        
         if (isDecimalMode) {
-            let decimalVal = (parseInt(currentInput.w) + (parseInt(currentInput.n || 0) / parseInt(currentInput.d || 1))) * sign;
-            main.innerHTML = `<div class="whole-part">${decimalVal.toFixed(4).replace(/\.?0+$/, '')}</div>`;
+            let valStr = (sign === -1 ? '-' : '') + currentInput.w;
+            main.innerHTML = `<div class="whole-part">${valStr}</div>`;
         } else {
             main.innerHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign); 
         }
     }
 
     function handleOp(op) {
-        if (storedValue !== null && (currentInput.w === '0' && currentInput.n === '' && currentInput.d === '')) {
-            activeOperator = op;
-            let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
-            document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span>`;
-            document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
-            document.getElementById('op-' + (op==='+'?'plus':op==='-'?'minus':op==='*'?'mul':'div')).classList.add('active-op');
-            return;
-        }
-        storedValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
-        storedDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
+        let val = parseFloat(currentInput.w) + (parseInt(currentInput.n || 0) / parseInt(currentInput.d || 1));
+        storedValue = val * sign;
+        storedDisplayHTML = isDecimalMode ? (sign === -1 ? '-' : '') + currentInput.w : renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
         activeOperator = op; justSolved = false;
         let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
         document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span>`;
@@ -214,35 +227,40 @@
     function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 
     function solve() {
-        if (!storedValue || !activeOperator) return;
-        let secondValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
-        let secondDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
-        let resNum, resDen;
-        if (activeOperator === '+') { resNum = storedValue.num * secondValue.den + secondValue.num * storedValue.den; resDen = storedValue.den * secondValue.den; }
-        else if (activeOperator === '-') { resNum = storedValue.num * secondValue.den - secondValue.num * storedValue.den; resDen = storedValue.den * secondValue.den; }
-        else if (activeOperator === '*') { resNum = storedValue.num * secondValue.num; resDen = storedValue.den * secondValue.den; }
-        else if (activeOperator === '/') { resNum = storedValue.num * secondValue.den; resDen = storedValue.den * secondValue.num; }
+        if (storedValue === null || !activeOperator) return;
+        let secondVal = (parseFloat(currentInput.w) + (parseInt(currentInput.n || 0) / parseInt(currentInput.d || 1))) * sign;
+        let secondDisplayHTML = isDecimalMode ? (sign === -1 ? '-' : '') + currentInput.w : renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
+        let res;
+        if (activeOperator === '+') res = storedValue + secondVal;
+        else if (activeOperator === '-') res = storedValue - secondVal;
+        else if (activeOperator === '*') res = storedValue * secondVal;
+        else if (activeOperator === '/') { if (secondVal === 0) { showError(); return; } res = storedValue / secondVal; }
 
-        if (resDen === 0) { showError(); return; }
-        
-        let originalResNum = resNum, originalResDen = resDen;
-        let common = gcd(Math.abs(resNum), Math.abs(resDen));
-        resNum /= common; resDen /= common;
-
-        let ent = Math.trunc(resNum / resDen), rem = Math.abs(resNum % resDen);
         let opChar = activeOperator === '*' ? '×' : activeOperator === '/' ? '÷' : activeOperator === '-' ? '−' : '+';
         document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span> ${secondDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">=</span>`;
         
         const mainVal = document.getElementById('main-val');
-        if (common > 1) { mainVal.classList.remove('anim-simplify'); void mainVal.offsetWidth; mainVal.classList.add('anim-simplify'); }
-
-        let decimal = originalResNum / originalResDen;
-        document.getElementById('round-8').innerText = formatAprox(decimal, 8);
-        document.getElementById('round-16').innerText = formatAprox(decimal, 16);
         
-        currentInput = { w: Math.abs(ent).toString(), n: rem !== 0 ? rem.toString() : '', d: rem !== 0 ? resDen.toString() : '' };
-        sign = (resNum < 0) ? -1 : 1; justSolved = true; storedValue = null; activeOperator = null;
-        updateDisplay();
+        // Convertir resultado a fracción para los otros campos
+        let decimal = Math.abs(res);
+        let precision = 1000000;
+        let common = gcd(Math.round(decimal * precision), precision);
+        let fN = Math.round(decimal * precision) / common;
+        let fD = precision / common;
+        
+        let ent = Math.trunc(fN / fD), rem = Math.abs(fN % fD);
+        
+        if (isDecimalMode) {
+            mainVal.innerHTML = `<div class="whole-part">${res.toFixed(4).replace(/\.?0+$/, '')}</div>`;
+        } else {
+            mainVal.innerHTML = renderFraction(Math.abs(ent).toString(), rem !== 0 ? rem.toString() : '', rem !== 0 ? fD.toString() : '', res < 0 ? -1 : 1);
+        }
+
+        document.getElementById('round-8').innerText = formatAprox(res, 8);
+        document.getElementById('round-16').innerText = formatAprox(res, 16);
+        
+        currentInput = { w: isDecimalMode ? Math.abs(res).toString() : Math.abs(ent).toString(), n: isDecimalMode ? '' : (rem !== 0 ? rem.toString() : ''), d: isDecimalMode ? '' : (rem !== 0 ? fD.toString() : '') };
+        sign = (res < 0) ? -1 : 1; justSolved = true; storedValue = null; activeOperator = null;
         document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
     }
 
