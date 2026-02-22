@@ -8,139 +8,75 @@
     <link rel="icon" type="image/png" href="icono.png?v=2">
     <link rel="apple-touch-icon" href="icono.png?v=2">
     
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Fracciones%20Plus%22,%22short_name%22:%22Fracciones%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#bdc3c7%22,%22theme_color%22:%22#bdc3c7%22,%22icons%22:[{%22src%22:%22icono.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Fracciones%20Plus%22,%22short_name%22:%22Fracciones%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#1a1a1a%22,%22theme_color%22:%22#bdc3c7%22,%22icons%22:[{%22src%22:%22icono.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
 
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#bdc3c7">
 
     <style>
         * { box-sizing: border-box; }
         body { 
-            background-color: #1a1a1a; /* Fondo oscuro para resaltar la calculadora */
+            background-color: #1a1a1a; 
             margin: 0; 
             display: flex; 
-            justify-content: center;
-            align-items: center; /* Centrado vertical */
+            justify-content: center; 
+            align-items: center; 
             height: 100vh; 
             font-family: Arial, sans-serif; 
             overflow: hidden; 
         }
         
         .calc-body { 
+            width: 100%; /* Ancho completo */
+            height: 90vh; /* 90% de la altura */
             display: flex;
             flex-direction: column;
-            width: 100%; 
-            height: 92vh; /* Reducido al 92% para dejar aire arriba y abajo */
-            max-width: 500px; /* Evita que se vea gigante en tablets */
-            background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0;
-            background-size: 2px 2px;
-            border-radius: 20px; /* Bordes más redondeados y elegantes */
-            padding-bottom: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 1px solid #999;
+            align-items: center;
+            justify-content: center;
+            background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0; 
+            background-size: 2px 2px; 
+            border-radius: 12px; 
+            padding-bottom: 15px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            border: 1px solid #777; 
         }
 
-        .header { 
-            height: 35px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-size: 11px; 
-            font-weight: bold; 
-            color: #444; 
-            border-bottom: 1px solid #999; 
-            gap: 5px;
-        }
+        /* El resto de estilos se mantienen idénticos a la v2.1 para no alterar lo visual */
+        .header { height: 35px; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; color: #444; border-bottom: 1px solid #999; gap: 5px; width: 100%; }
         .version-tag { font-size: 8px; color: #666; vertical-align: super; }
-
-        .display-container { 
-            background-color: #8fb8c5; 
-            margin: 10px; 
-            flex: 0 0 140px; /* Altura controlada para la pantalla */
-            border: 3px solid #555; 
-            border-radius: 10px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-end; 
-            padding: 8px 15px; 
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.4); 
-            position: relative;
-            overflow: hidden;
-        }
-
-        .display-container::before { 
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%); 
-            background-size: 100% 3px; pointer-events: none; 
-        }
-
-        #process-val { display: flex; align-items: center; justify-content: flex-end; color: rgba(0,0,0,0.4); font-weight: bold; width: 100%; min-height: 30px; transform: scale(0.8); transform-origin: right; font-family: 'Courier New', monospace; }
-        .fraction-display { display: flex; align-items: center; justify-content: flex-end; color: #111; font-weight: bold; width: 100%; margin-bottom: 2px; }
+        .display-container { background-color: #8fb8c5; margin: 12px; height: 140px; width: 336px; border: 3px solid #555; border-radius: 4px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 15px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .display-container::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%); background-size: 100% 3px; pointer-events: none; }
+        @keyframes simplifyPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.3); color: #004d40; } 100% { transform: scale(1); filter: brightness(1); } }
+        .anim-simplify { animation: simplifyPulse 0.6s ease-out; }
+        #process-val { display: flex; align-items: center; justify-content: flex-end; color: rgba(0,0,0,0.45); font-weight: bold; width: 100%; min-height: 35px; transform: scale(0.8); transform-origin: right; margin-bottom: 2px; font-family: 'Courier New', monospace; }
+        .fraction-display { display: flex; align-items: center; justify-content: flex-end; color: #111; font-weight: bold; width: 100%; margin-bottom: 5px; transition: all 0.3s; }
         .whole-part { font-size: 2.8rem; margin-right: 3px; }
         .fraction-part { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 4px; }
         .num-part { font-size: 1.2rem; border-bottom: 2px solid currentColor; padding: 0 3px; line-height: 1; }
         .den-part { font-size: 1.2rem; line-height: 1; padding: 2px 3px 0; }
-
-        .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 5px; }
-        .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 4px; flex: 1; margin: 0 4px; }
+        .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.2); padding-top: 8px; margin-top: 5px; }
+        .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.08); padding: 5px 10px; border-radius: 4px; flex: 1; margin: 0 4px; }
         .aprox-label { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.5); }
         .aprox-val { font-size: 0.9rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
-
-        .keyboards-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            padding: 5px 12px; 
-            gap: 12px; 
-            flex-grow: 1; 
-        }
-        .grid-3x4 { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 6px; 
-            flex-grow: 1; 
-        }
-        
-        button { 
-            width: 100%;
-            height: 100%; 
-            border: 1px solid #888; 
-            border-radius: 12px; 
-            background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); 
-            box-shadow: 0 4px 0 #7f8c8d; 
-            font-size: 1.3rem; 
-            font-weight: bold; 
-            color: #2c3e50; 
-            cursor: pointer; 
-            transition: transform 0.05s;
-            position: relative;
-        }
-
+        .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; width: 360px; }
+        .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        button { height: 48px; border: 1px solid #888; border-radius: 8px; background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); box-shadow: 0 4px 0 #7f8c8d; font-size: 1.2rem; font-weight: bold; color: #2c3e50; cursor: pointer; transition: transform 0.05s; position: relative; }
         button:active { transform: translateY(3px); box-shadow: 0 1px 0 #7f8c8d; }
         .btn-red { background: linear-gradient(to bottom, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 0 #962d22; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); color: white; box-shadow: 0 4px 0 #1c5982; }
-        
-        .operators-row { 
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 8px; 
-            padding: 10px 12px; 
-            height: 70px;
-        }
-        .btn-op { border-radius: 50%; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; }
-        .btn-orange { border-radius: 15px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 1.8rem; }
+        .operators-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px 10px 0; width: 360px; }
+        .btn-op { border-radius: 50%; height: 55px; width: 55px; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; }
+        .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 1.8rem; width: 65px; }
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
-
-        .small-keypad { flex-grow: 1; display: flex; flex-direction: column; }
-        .visual-divider { border-bottom: 3px solid #888; margin: 6px 0; border-radius: 2px; opacity: 0.6; }
+        .small-keypad button { height: 40px; font-size: 1rem; }
+        .visual-divider { border-bottom: 4px solid #7f8c8d; margin: 12px 0; box-shadow: 0 1px 0 rgba(255,255,255,0.4); border-radius: 2px; }
     </style>
 </head>
 <body>
 
 <div class="calc-body">
     <div class="header">FRACCIONES PLUS PRO <span id="app-version" class="version-tag"></span></div>
-    
     <div class="display-container">
         <div id="process-val"></div>
         <div id="main-val" class="fraction-display"><div class="whole-part">0</div></div>
@@ -149,9 +85,9 @@
             <div class="aprox-box"><span class="aprox-label">Aprox. 1/16</span><span id="round-16" class="aprox-val">-</span></div>
         </div>
     </div>
-
     <div class="keyboards-grid">
         <div class="left-column">
+            <div style="height: 12px;"></div> 
             <div class="grid-3x4">
                 <button class="btn-red" onclick="action('clearAll')">C</button>
                 <button class="btn-blue" onclick="action('toggleSign')">+/-</button>
@@ -162,7 +98,7 @@
                 <button style="grid-column: span 3;" onclick="action('press', 'w', 0)">0</button>
             </div>
         </div>
-        <div class="right-column" style="display:flex; flex-direction:column;">
+        <div class="right-column">
             <div class="small-keypad">
                 <div class="grid-3x4">
                     <button onclick="action('press', 'n', 1)">1</button><button onclick="action('press', 'n', 2)">2</button><button onclick="action('press', 'n', 3)">3</button>
@@ -184,7 +120,6 @@
             </div>
         </div>
     </div>
-
     <div class="operators-row">
         <button class="btn-op" id="op-plus" onclick="action('handleOp', '+')">+</button>
         <button class="btn-op" id="op-minus" onclick="action('handleOp', '-')">−</button>
@@ -195,16 +130,22 @@
 </div>
 
 <script>
-    const APP_VERSION = "2.3";
+    const APP_VERSION = "2.4";
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
     function action(fnName, ...args) {
-        if ("vibrate" in navigator) navigator.vibrate(20);
-        clickSound.currentTime = 0; clickSound.play().catch(() => {}); 
-        if (fnName === 'press') press(...args); if (fnName === 'back') back(...args); if (fnName === 'clearAll') clearAll();
-        if (fnName === 'toggleSign') toggleSign(); if (fnName === 'handleOp') handleOp(...args); if (fnName === 'solve') solve();
+        if ("vibrate" in navigator) navigator.vibrate(20); 
+        clickSound.currentTime = 0;
+        clickSound.play().catch(() => {}); 
+        if (fnName === 'press') press(...args);
+        if (fnName === 'back') back(...args);
+        if (fnName === 'clearAll') clearAll();
+        if (fnName === 'toggleSign') toggleSign();
+        if (fnName === 'handleOp') handleOp(...args);
+        if (fnName === 'solve') solve();
     }
     document.addEventListener("DOMContentLoaded", () => { document.getElementById("app-version").innerText = "v" + APP_VERSION; });
-    let currentInput = { w: '0', n: '', d: '' }; let storedValue = null, storedDisplayHTML = "", activeOperator = null, sign = 1, justSolved = false;
+    let currentInput = { w: '0', n: '', d: '' };
+    let storedValue = null, storedDisplayHTML = "", activeOperator = null, sign = 1, justSolved = false;
     function renderFraction(w, n, d, s) {
         let wholeStr = (s === -1 ? '-' : '');
         if (w !== '0' || (n === '' && d === '')) wholeStr += w; else if (s === -1) wholeStr = '-';
@@ -248,3 +189,4 @@
 </script>
 </body>
 </html>
+ 
