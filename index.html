@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fracciones Plus Pro</title>
+    
+    <link rel="icon" type="image/png" href="icono.png">
+    <link rel="apple-touch-icon" href="icono.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; }
         
@@ -64,7 +70,6 @@
         .aprox-label { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.5); }
         .aprox-val { font-size: 0.9rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
 
-        /* Teclados */
         .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; }
         .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
@@ -95,7 +100,6 @@
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
         .small-keypad button { height: 40px; font-size: 1rem; }
         
-        /* Línea divisoria más gruesa */
         .visual-divider { border-bottom: 4px solid #7f8c8d; margin: 12px 0; box-shadow: 0 1px 0 rgba(255,255,255,0.4); border-radius: 2px; }
     </style>
 </head>
@@ -118,7 +122,8 @@
 
     <div class="keyboards-grid">
         <div class="left-column">
-            <div style="height: 12px;"></div> <div class="grid-3x4">
+            <div style="height: 12px;"></div> 
+            <div class="grid-3x4">
                 <button class="btn-red" onclick="action('clearAll')">C</button>
                 <button class="btn-blue" onclick="action('toggleSign')">+/-</button>
                 <button class="btn-blue" onclick="action('back', 'w')">⌫</button>
@@ -163,7 +168,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "1.7";
+    const APP_VERSION = "1.8";
 
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
 
