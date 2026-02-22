@@ -22,13 +22,13 @@
         .den-part { font-size: 1.2rem; line-height: 1; padding: 2px 3px 0; }
         .operator-text { font-size: 1.5rem; margin: 0 8px; }
 
-        /* Estilos para Aproximaciones (Sin iconos) */
+        /* Aproximaciones */
         .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 6px; margin-top: 5px; }
         .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.05); padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); flex: 1; margin: 0 4px; }
         .aprox-label { font-size: 0.65rem; font-weight: bold; color: rgba(0,0,0,0.6); text-transform: uppercase; margin-bottom: 2px; }
         .aprox-val { font-size: 0.9rem; color: #111; font-weight: bold; font-family: 'Courier New', Courier, monospace; }
 
-        /* Keyboards */
+        /* Teclados */
         .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; }
         .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         button { height: 48px; border: 1px solid #888; border-radius: 5px; background: linear-gradient(to bottom, #f8f8f8, #c5c5c5); box-shadow: 0 3px 0 #888; font-size: 1.2rem; font-weight: bold; color: #333; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -113,43 +113,63 @@
     let currentInput = { w: '0', n: '', d: '' };
     let storedValue = null, storedDisplayHTML = "", activeOperator = null, sign = 1, justSolved = false;
 
-    // Detectar tecla ESC
     window.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            clearAll();
-        }
+        if (event.key === 'Escape') clearAll();
     });
 
     function renderFraction(w, n, d, s) {
         let wholeStr = (s === -1 ? '-' : '');
-        if (w !== '0' || (n === '' && d === '')) wholeStr += w; else if (s === -1) wholeStr = '-';
+        if (w !== '0' || (n === '' && d === '')) wholeStr += w; 
+        else if (s === -1) wholeStr = '-';
         let html = `<div class="whole-part">${wholeStr}</div>`;
-        if (n !== '' || d !== '') html += `<div class="fraction-part"><div class="num-part">${n || '0'}</div><div class="den-part">${d || '?'}</div></div>`;
+        if (n !== '' || d !== '') {
+            html += `<div class="fraction-part"><div class="num-part">${n || '0'}</div><div class="den-part">${d || '?'}</div></div>`;
+        }
         return html;
     }
 
-    function press(part, val) { if (justSolved) { clearAll(); justSolved = false; } if (currentInput[part] === '0') currentInput[part] = val.toString(); else currentInput[part] += val.toString(); updateDisplay(); }
-    function back(part) { if (justSolved) { clearAll(); justSolved = false; return; } currentInput[part] = currentInput[part].slice(0, -1); if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); updateDisplay(); }
-    function toggleSign() { if (justSolved) justSolved = false; sign *= -1; updateDisplay(); }
-    
-    function clearAll() { 
-        currentInput = { w: '0', n: '', d: '' }; 
-        storedValue = null; 
-        storedDisplayHTML = ""; 
-        activeOperator = null; 
-        sign = 1; 
-        justSolved = false; 
-        document.getElementById('process-val').innerHTML = ""; 
+    function press(part, val) { 
+        if (justSolved) { clearAll(); justSolved = false; } 
+        if (currentInput[part] === '0') currentInput[part] = val.toString(); 
+        else currentInput[part] += val.toString(); 
         updateDisplay(); 
-        document.getElementById('round-8').innerText = "-"; 
-        document.getElementById('round-16').innerText = "-"; 
+    }
+
+    function back(part) { 
+        if (justSolved) { clearAll(); justSolved = false; return; } 
+        currentInput[part] = currentInput[part].slice(0, -1); 
+        if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); 
+        updateDisplay(); 
+    }
+
+    function toggleSign() { if (justSolved) justSolved = false; sign *= -1; updateDisplay(); }
+
+    function clearAll() { 
+        currentInput = { w: '0', n: '', d: '' }; storedValue = null; storedDisplayHTML = ""; activeOperator = null; sign = 1; justSolved = false; 
+        document.getElementById('process-val').innerHTML = ""; updateDisplay(); 
+        document.getElementById('round-8').innerText = "-"; document.getElementById('round-16').innerText = "-"; 
         document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op')); 
     }
 
-    function updateDisplay(htmlOverride = null) { const main = document.getElementById('main-val'); if (htmlOverride) { main.innerHTML = htmlOverride; return; } main.innerHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign); }
+    function updateDisplay(htmlOverride = null) { 
+        const main = document.getElementById('main-val'); 
+        if (htmlOverride) { main.innerHTML = htmlOverride; return; } 
+        main.innerHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign); 
+    }
 
     function handleOp(op) {
-        storedValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
+        if (storedValue !== null && (currentInput.w === '0' && currentInput.n === '' && currentInput.d === '')) {
+            activeOperator = op;
+            let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
+            document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span class="operator-text">${opChar}</span>`;
+            document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
+            document.getElementById('op-' + (op==='+'?'plus':op==='-'?'minus':op==='*'?'mul':'div')).classList.add('active-op');
+            return;
+        }
+        storedValue = { 
+            num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, 
+            den: parseInt(currentInput.d) || 1 
+        };
         storedDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
         activeOperator = op; justSolved = false;
         let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
@@ -177,7 +197,8 @@
         let ent = Math.trunc(fN / fD), rem = Math.abs(fN % fD);
         
         let opChar = activeOperator === '*' ? '×' : activeOperator === '/' ? '÷' : activeOperator === '-' ? '−' : '+';
-        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} ${opChar} ${secondDisplayHTML} =`;
+        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span class="operator-text">${opChar}</span> ${secondDisplayHTML} <span class="operator-text">=</span>`;
+        
         updateDisplay(renderFraction(Math.abs(ent).toString(), rem !== 0 ? rem.toString() : '', rem !== 0 ? fD.toString() : '', fN < 0 ? -1 : 1));
         
         let decimal = resNum / resDen;
