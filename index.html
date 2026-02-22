@@ -18,53 +18,54 @@
     <style>
         * { box-sizing: border-box; }
         body { 
-            background-color: #bdc3c7; 
+            background-color: #1a1a1a; /* Fondo oscuro para resaltar la calculadora */
             margin: 0; 
             display: flex; 
-            flex-direction: column;
+            justify-content: center;
+            align-items: center; /* Centrado vertical */
             height: 100vh; 
             font-family: Arial, sans-serif; 
             overflow: hidden; 
         }
         
-        /* Contenedor principal ocupa todo el ancho y alto */
         .calc-body { 
             display: flex;
             flex-direction: column;
             width: 100%; 
-            height: 100%;
+            height: 92vh; /* Reducido al 92% para dejar aire arriba y abajo */
+            max-width: 500px; /* Evita que se vea gigante en tablets */
             background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0;
             background-size: 2px 2px;
-            padding-bottom: env(safe-area-inset-bottom, 15px); 
-            border: none; 
+            border-radius: 20px; /* Bordes más redondeados y elegantes */
+            padding-bottom: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid #999;
         }
 
         .header { 
-            height: 40px; 
+            height: 35px; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 12px; 
+            font-size: 11px; 
             font-weight: bold; 
             color: #444; 
             border-bottom: 1px solid #999; 
             gap: 5px;
-            padding-top: env(safe-area-inset-top, 0);
         }
-        .version-tag { font-size: 9px; color: #666; vertical-align: super; }
+        .version-tag { font-size: 8px; color: #666; vertical-align: super; }
 
-        /* Pantalla LCD adaptable */
         .display-container { 
             background-color: #8fb8c5; 
             margin: 10px; 
-            flex: 0 0 160px; /* Altura fija para la pantalla */
+            flex: 0 0 140px; /* Altura controlada para la pantalla */
             border: 3px solid #555; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-end; 
-            padding: 10px 15px; 
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); 
+            padding: 8px 15px; 
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.4); 
             position: relative;
             overflow: hidden;
         }
@@ -75,43 +76,40 @@
             background-size: 100% 3px; pointer-events: none; 
         }
 
-        #process-val { display: flex; align-items: center; justify-content: flex-end; color: rgba(0,0,0,0.45); font-weight: bold; width: 100%; min-height: 35px; transform: scale(0.8); transform-origin: right; margin-bottom: 2px; font-family: 'Courier New', monospace; }
-        .fraction-display { display: flex; align-items: center; justify-content: flex-end; color: #111; font-weight: bold; width: 100%; margin-bottom: 5px; }
-        .whole-part { font-size: 3.2rem; margin-right: 3px; }
+        #process-val { display: flex; align-items: center; justify-content: flex-end; color: rgba(0,0,0,0.4); font-weight: bold; width: 100%; min-height: 30px; transform: scale(0.8); transform-origin: right; font-family: 'Courier New', monospace; }
+        .fraction-display { display: flex; align-items: center; justify-content: flex-end; color: #111; font-weight: bold; width: 100%; margin-bottom: 2px; }
+        .whole-part { font-size: 2.8rem; margin-right: 3px; }
         .fraction-part { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 4px; }
-        .num-part { font-size: 1.4rem; border-bottom: 2px solid currentColor; padding: 0 3px; line-height: 1; }
-        .den-part { font-size: 1.4rem; line-height: 1; padding: 2px 3px 0; }
+        .num-part { font-size: 1.2rem; border-bottom: 2px solid currentColor; padding: 0 3px; line-height: 1; }
+        .den-part { font-size: 1.2rem; line-height: 1; padding: 2px 3px 0; }
 
-        /* Aproximaciones */
-        .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.2); padding-top: 8px; }
-        .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.08); padding: 5px 10px; border-radius: 4px; flex: 1; margin: 0 4px; }
-        .aprox-label { font-size: 0.7rem; font-weight: bold; color: rgba(0,0,0,0.5); }
-        .aprox-val { font-size: 1rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
+        .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.15); padding-top: 5px; }
+        .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 4px; flex: 1; margin: 0 4px; }
+        .aprox-label { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.5); }
+        .aprox-val { font-size: 0.9rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
 
-        /* Teclados que llenan el espacio restante */
         .keyboards-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            padding: 5px 10px; 
-            gap: 10px; 
-            flex-grow: 1; /* Esto hace que el teclado se estire hacia abajo */
+            padding: 5px 12px; 
+            gap: 12px; 
+            flex-grow: 1; 
         }
-        .left-column, .right-column { display: flex; flex-direction: column; height: 100%; }
         .grid-3x4 { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            gap: 8px; 
+            gap: 6px; 
             flex-grow: 1; 
         }
         
         button { 
             width: 100%;
-            height: 100%; /* Botones se estiran proporcionalmente */
+            height: 100%; 
             border: 1px solid #888; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); 
             box-shadow: 0 4px 0 #7f8c8d; 
-            font-size: 1.4rem; 
+            font-size: 1.3rem; 
             font-weight: bold; 
             color: #2c3e50; 
             cursor: pointer; 
@@ -126,16 +124,16 @@
         .operators-row { 
             display: grid; 
             grid-template-columns: repeat(5, 1fr); 
-            gap: 10px; 
-            padding: 10px; 
-            height: 80px;
+            gap: 8px; 
+            padding: 10px 12px; 
+            height: 70px;
         }
         .btn-op { border-radius: 50%; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; }
-        .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 2rem; }
+        .btn-orange { border-radius: 15px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 1.8rem; }
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
 
         .small-keypad { flex-grow: 1; display: flex; flex-direction: column; }
-        .visual-divider { border-bottom: 4px solid #7f8c8d; margin: 8px 0; border-radius: 2px; }
+        .visual-divider { border-bottom: 3px solid #888; margin: 6px 0; border-radius: 2px; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -164,7 +162,7 @@
                 <button style="grid-column: span 3;" onclick="action('press', 'w', 0)">0</button>
             </div>
         </div>
-        <div class="right-column">
+        <div class="right-column" style="display:flex; flex-direction:column;">
             <div class="small-keypad">
                 <div class="grid-3x4">
                     <button onclick="action('press', 'n', 1)">1</button><button onclick="action('press', 'n', 2)">2</button><button onclick="action('press', 'n', 3)">3</button>
@@ -197,7 +195,7 @@
 </div>
 
 <script>
-    const APP_VERSION = "2.2";
+    const APP_VERSION = "2.3";
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
     function action(fnName, ...args) {
         if ("vibrate" in navigator) navigator.vibrate(20);
