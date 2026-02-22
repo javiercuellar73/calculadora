@@ -64,9 +64,10 @@
         .aprox-label { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.5); }
         .aprox-val { font-size: 0.9rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
 
+        /* Teclados */
         .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; }
         .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        
+
         button { 
             height: 48px; 
             border: 1px solid #888; 
@@ -93,6 +94,9 @@
         .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 1.8rem; width: 65px; }
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
         .small-keypad button { height: 40px; font-size: 1rem; }
+        
+        /* Línea divisoria más gruesa */
+        .visual-divider { border-bottom: 4px solid #7f8c8d; margin: 12px 0; box-shadow: 0 1px 0 rgba(255,255,255,0.4); border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -114,7 +118,7 @@
 
     <div class="keyboards-grid">
         <div class="left-column">
-            <div class="grid-3x4">
+            <div style="height: 12px;"></div> <div class="grid-3x4">
                 <button class="btn-red" onclick="action('clearAll')">C</button>
                 <button class="btn-blue" onclick="action('toggleSign')">+/-</button>
                 <button class="btn-blue" onclick="action('back', 'w')">⌫</button>
@@ -134,7 +138,9 @@
                     <button class="btn-blue" style="grid-column: span 2" onclick="action('back', 'n')">⌫</button>
                 </div>
             </div>
-            <div style="border-bottom:2px solid #888; margin:4px 0; opacity:0.5"></div>
+            
+            <div class="visual-divider"></div>
+
             <div class="small-keypad">
                 <div class="grid-3x4">
                     <button onclick="action('press', 'd', 1)">1</button><button onclick="action('press', 'd', 2)">2</button><button onclick="action('press', 'd', 3)">3</button>
@@ -157,20 +163,15 @@
 </div>
 
 <script>
-    const APP_VERSION = "1.5";
+    const APP_VERSION = "1.7";
 
-    // Audio Data URI para el sonido de clic
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
 
     function action(fnName, ...args) {
-        // Ejecutar Vibración
         if ("vibrate" in navigator) navigator.vibrate(20);
-        
-        // Ejecutar Sonido (resetear para permitir clics rápidos)
         clickSound.currentTime = 0;
         clickSound.play().catch(() => {}); 
 
-        // Llamar a la función lógica
         if (fnName === 'press') press(...args);
         if (fnName === 'back') back(...args);
         if (fnName === 'clearAll') clearAll();
@@ -263,7 +264,7 @@
 
         let ent = Math.trunc(resNum / resDen), rem = Math.abs(resNum % resDen);
         let opChar = activeOperator === '*' ? '×' : activeOperator === '/' ? '÷' : activeOperator === '-' ? '−' : '+';
-        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} ${opChar} ${secondDisplayHTML} =`;
+        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span> ${secondDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">=</span>`;
         
         const mainVal = document.getElementById('main-val');
         mainVal.innerHTML = renderFraction(Math.abs(ent).toString(), rem !== 0 ? rem.toString() : '', rem !== 0 ? resDen.toString() : '', resNum < 0 ? -1 : 1);
