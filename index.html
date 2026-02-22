@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fracciones Plus Pro</title>
     
     <link rel="icon" type="image/png" href="icono.png?v=2">
@@ -15,37 +15,11 @@
     <meta name="theme-color" content="#bdc3c7">
 
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            background-color: #1a1a1a; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            font-family: Arial, sans-serif; 
-            overflow: hidden; 
-        }
-        
-        .calc-body { 
-            width: 100%; /* Ancho completo */
-            height: 90vh; /* 90% de la altura */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0; 
-            background-size: 2px 2px; 
-            border-radius: 12px; 
-            padding-bottom: 15px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
-            border: 1px solid #777; 
-        }
-
-        /* El resto de estilos se mantienen idénticos a la v2.1 para no alterar lo visual */
-        .header { height: 35px; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; color: #444; border-bottom: 1px solid #999; gap: 5px; width: 100%; }
+        body { background-color: #1a1a1a; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; overflow: hidden; }
+        .calc-body { width: 360px; background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0; background-size: 2px 2px; border-radius: 12px; padding-bottom: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); border: 1px solid #777; }
+        .header { height: 35px; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; color: #444; border-bottom: 1px solid #999; gap: 5px; }
         .version-tag { font-size: 8px; color: #666; vertical-align: super; }
-        .display-container { background-color: #8fb8c5; margin: 12px; height: 140px; width: 336px; border: 3px solid #555; border-radius: 4px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 15px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .display-container { background-color: #8fb8c5; margin: 12px; height: 140px; border: 3px solid #555; border-radius: 4px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 15px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .display-container::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%); background-size: 100% 3px; pointer-events: none; }
         @keyframes simplifyPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.05); filter: brightness(1.3); color: #004d40; } 100% { transform: scale(1); filter: brightness(1); } }
         .anim-simplify { animation: simplifyPulse 0.6s ease-out; }
@@ -59,13 +33,13 @@
         .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.08); padding: 5px 10px; border-radius: 4px; flex: 1; margin: 0 4px; }
         .aprox-label { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.5); }
         .aprox-val { font-size: 0.9rem; color: #000; font-weight: bold; font-family: 'Courier New', monospace; }
-        .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; width: 360px; }
+        .keyboards-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 5px 10px; gap: 10px; }
         .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         button { height: 48px; border: 1px solid #888; border-radius: 8px; background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); box-shadow: 0 4px 0 #7f8c8d; font-size: 1.2rem; font-weight: bold; color: #2c3e50; cursor: pointer; transition: transform 0.05s; position: relative; }
         button:active { transform: translateY(3px); box-shadow: 0 1px 0 #7f8c8d; }
         .btn-red { background: linear-gradient(to bottom, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 0 #962d22; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); color: white; box-shadow: 0 4px 0 #1c5982; }
-        .operators-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px 10px 0; width: 360px; }
+        .operators-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px 10px 0; }
         .btn-op { border-radius: 50%; height: 55px; width: 55px; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; }
         .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 1.8rem; width: 65px; }
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
@@ -130,10 +104,10 @@
 </div>
 
 <script>
-    const APP_VERSION = "2.4";
+    const APP_VERSION = "2.1";
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
     function action(fnName, ...args) {
-        if ("vibrate" in navigator) navigator.vibrate(20); 
+        if ("vibrate" in navigator) navigator.vibrate(20);
         clickSound.currentTime = 0;
         clickSound.play().catch(() => {}); 
         if (fnName === 'press') press(...args);
@@ -189,4 +163,3 @@
 </script>
 </body>
 </html>
- 
