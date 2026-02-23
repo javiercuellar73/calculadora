@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Fracciones Plus Pro v3.1</title>
+    <title>Fracciones Pro</title>
     
     <link rel="icon" type="image/png" href="icono.png?v=2">
     <link rel="apple-touch-icon" href="icono.png?v=2">
     
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Fracciones%20Plus%22,%22short_name%22:%22Fracciones%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#1a1a1a%22,%22theme_color%22:%22#bdc3c7%22,%22icons%22:[{%22src%22:%22icono.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Fracciones%20Pro%22,%22short_name%22:%22Fracciones%20Pro%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#1a1a1a%22,%22theme_color%22:%22#bdc3c7%22,%22icons%22:[{%22src%22:%22icono.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
 
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,8 +18,8 @@
         :root { 
             --lcd-text: #111; 
             --lcd-sub: rgba(0,0,0,0.45); 
-            --calc-width: 95vw;
-            --max-calc-width: 420px;
+            --calc-width: 100vw;
+            --max-calc-width: 450px;
         }
         body.dark-theme { --lcd-text: #ecf0f1; --lcd-sub: rgba(236, 240, 241, 0.4); }
 
@@ -28,7 +28,7 @@
             margin: 0; 
             display: flex; 
             justify-content: center; 
-            align-items: center; 
+            align-items: flex-start; /* Alineación al tope superior */
             height: 100vh; 
             font-family: Arial, sans-serif; 
             overflow: hidden; 
@@ -41,10 +41,11 @@
             max-width: var(--max-calc-width);
             background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0; 
             background-size: 2px 2px; 
-            border-radius: 12px; 
-            padding-bottom: 15px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            border-radius: 0 0 12px 12px; /* Redondeado solo abajo para que pegue arriba */
+            padding-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
             border: 1px solid #777; 
+            border-top: none; /* Quita borde superior para integración total */
             transition: background 0.3s;
             display: flex;
             flex-direction: column;
@@ -52,24 +53,23 @@
         body.dark-theme .calc-body { background: #2c3e50; border-color: #1a252f; }
 
         .header { 
-            height: 35px; 
+            height: 40px; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            font-size: 11px; 
+            font-size: 13px; 
             font-weight: bold; 
             color: #444; 
             border-bottom: 1px solid #999; 
-            gap: 5px; 
+            letter-spacing: 1px;
         }
         body.dark-theme .header { color: #bdc3c7; border-bottom-color: #34495e; }
-        .version-tag { font-size: 8px; color: #666; vertical-align: super; }
 
         .display-container { 
             background-color: #8fb8c5; 
-            margin: 12px; 
-            height: 22vh; 
-            min-height: 120px;
+            margin: 10px; 
+            height: 25vh; 
+            min-height: 130px;
             border: 3px solid #555; 
             border-radius: 4px; 
             display: flex; 
@@ -79,11 +79,9 @@
             box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); 
             position: relative; 
             overflow: hidden; 
-            transition: background 0.3s; 
         }
         body.dark-theme .display-container { background-color: #2c3e50; }
         
-        /* Botones LCD */
         .lcd-btn { position: absolute; left: 8px; font-size: 10px; cursor: pointer; background: rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.2); border-radius: 3px; padding: 4px 8px; color: var(--lcd-text); z-index: 5; font-weight: bold; }
         #btn-dec { top: 8px; }
         #btn-theme { top: 38px; }
@@ -91,26 +89,26 @@
         #process-val { display: flex; align-items: center; justify-content: flex-end; color: var(--lcd-sub); font-weight: bold; width: 100%; min-height: 30px; transform: scale(0.85); transform-origin: right; font-family: 'Courier New', monospace; }
         .fraction-display { display: flex; align-items: center; justify-content: flex-end; color: var(--lcd-text); font-weight: bold; width: 100%; margin-bottom: 5px; }
         
-        .whole-part { font-size: clamp(2rem, 10vw, 3rem); margin-right: 3px; }
+        .whole-part { font-size: clamp(2.2rem, 12vw, 3.5rem); margin-right: 3px; }
         .fraction-part { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 4px; }
-        .num-part { font-size: clamp(1rem, 5vw, 1.4rem); border-bottom: 2px solid currentColor; padding: 0 3px; line-height: 1; }
-        .den-part { font-size: clamp(1rem, 5vw, 1.4rem); line-height: 1; padding: 2px 3px 0; }
+        .num-part { font-size: clamp(1.2rem, 6vw, 1.8rem); border-bottom: 2px solid currentColor; padding: 0 3px; line-height: 1; }
+        .den-part { font-size: clamp(1.2rem, 6vw, 1.8rem); line-height: 1; padding: 2px 3px 0; }
         
         .aprox-container { display: flex; justify-content: space-between; width: 100%; border-top: 1px solid rgba(0,0,0,0.2); padding-top: 8px; margin-top: 5px; }
         .aprox-box { display: flex; flex-direction: column; background: rgba(0,0,0,0.08); padding: 4px; border-radius: 4px; flex: 1; margin: 0 2px; text-align: center; }
-        .aprox-label { font-size: 0.6rem; font-weight: bold; color: var(--lcd-sub); }
-        .aprox-val { font-size: 0.8rem; color: var(--lcd-text); font-weight: bold; font-family: 'Courier New', monospace; }
+        .aprox-label { font-size: 0.65rem; font-weight: bold; color: var(--lcd-sub); }
+        .aprox-val { font-size: 0.9rem; color: var(--lcd-text); font-weight: bold; }
 
-        .keyboards-grid { display: grid; grid-template-columns: 1.1fr 1fr; padding: 5px 10px; gap: 10px; }
+        .keyboards-grid { display: grid; grid-template-columns: 1.1fr 1fr; padding: 5px 10px; gap: 8px; }
         .grid-3x4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
         button { 
-            height: clamp(40px, 7vh, 55px); 
+            height: clamp(45px, 8vh, 60px); 
             border: 1px solid #888; 
             border-radius: 8px; 
             background: linear-gradient(to bottom, #fcfcfc, #bdc3c7); 
             box-shadow: 0 4px 0 #7f8c8d; 
-            font-size: 1.2rem; 
+            font-size: 1.3rem; 
             font-weight: bold; 
             color: #2c3e50; 
             cursor: pointer; 
@@ -121,19 +119,19 @@
         .btn-red { background: linear-gradient(to bottom, #e74c3c, #c0392b); color: white; box-shadow: 0 4px 0 #962d22; }
         .btn-blue { background: linear-gradient(to bottom, #3498db, #2980b9); color: white; box-shadow: 0 4px 0 #1c5982; }
         
-        .operators-row { display: flex; justify-content: space-between; padding: 15px 10px 0; gap: 5px; }
-        .btn-op { border-radius: 50%; height: 14vw; width: 14vw; max-width: 60px; max-height: 60px; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; font-size: 1.4rem; }
-        .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 2rem; flex: 1.2; height: 14vw; max-height: 60px; }
+        .operators-row { display: flex; justify-content: space-between; padding: 10px 10px 0; gap: 6px; }
+        .btn-op { border-radius: 50%; height: 15vw; width: 15vw; max-width: 65px; max-height: 65px; background: linear-gradient(to bottom, #34495e, #2c3e50); color: white; box-shadow: 0 4px 0 #1a252f; font-size: 1.5rem; }
+        .btn-orange { border-radius: 12px; background: linear-gradient(to bottom, #f39c12, #d35400); color: white; box-shadow: 0 4px 0 #a04000; font-size: 2.2rem; flex: 1.5; height: 15vw; max-height: 65px; }
         
         .active-op { background: #f1c40f !important; color: #000 !important; box-shadow: 0 4px 0 #9b810c !important; }
-        .small-keypad button { height: clamp(35px, 6vh, 45px); font-size: 1rem; }
-        .visual-divider { border-bottom: 2px solid #7f8c8d; margin: 8px 0; opacity: 0.5; }
+        .small-keypad button { height: clamp(40px, 7vh, 50px); font-size: 1.1rem; }
+        .visual-divider { border-bottom: 2px solid #7f8c8d; margin: 8px 0; opacity: 0.4; }
     </style>
 </head>
 <body>
 
 <div class="calc-body">
-    <div class="header">FRACCIONES PLUS PRO <span id="app-version" class="version-tag"></span></div>
+    <div class="header">FRACCIONES PRO</div>
     <div class="display-container" id="lcd">
         <div class="lcd-btn" id="btn-dec" onclick="toggleDecimal()">DEC</div>
         <div class="lcd-btn" id="btn-theme" onclick="toggleTheme()">☀️</div>
@@ -144,6 +142,7 @@
             <div class="aprox-box"><span class="aprox-label">Aprox. 1/16</span><span id="round-16" class="aprox-val">-</span></div>
         </div>
     </div>
+    
     <div class="keyboards-grid">
         <div class="left-column">
             <div class="grid-3x4">
@@ -178,6 +177,7 @@
             </div>
         </div>
     </div>
+    
     <div class="operators-row">
         <button class="btn-op" id="op-plus" onclick="action('handleOp', '+')">+</button>
         <button class="btn-op" id="op-minus" onclick="action('handleOp', '-')">−</button>
@@ -188,14 +188,12 @@
 </div>
 
 <script>
-    const APP_VERSION = "3.1.2";
     const clickSound = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFRm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT18AZmZmf39/f39/f2ZmZg==");
-    
     let currentInput = { w: '0', n: '', d: '' };
     let storedValue = null, storedDisplayHTML = "", activeOperator = null, sign = 1, justSolved = false, isDecimalMode = false;
 
     function action(fnName, ...args) {
-        if ("vibrate" in navigator) navigator.vibrate(20);
+        if ("vibrate" in navigator) navigator.vibrate(15);
         clickSound.currentTime = 0;
         clickSound.play().catch(() => {}); 
         if (fnName === 'press') press(...args);
@@ -206,26 +204,8 @@
         if (fnName === 'solve') solve();
     }
 
-    document.addEventListener("DOMContentLoaded", () => { document.getElementById("app-version").innerText = "v" + APP_VERSION; });
-
-    function toggleDecimal() {
-        isDecimalMode = !isDecimalMode;
-        document.getElementById('btn-dec').classList.toggle('active', isDecimalMode);
-        updateDisplay();
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        document.getElementById('btn-theme').innerText = document.body.classList.contains('dark-theme') ? "🌙" : "☀️";
-    }
-
-    function showError() {
-        const lcd = document.getElementById('lcd');
-        lcd.classList.add('error-flash');
-        setTimeout(() => lcd.classList.remove('error-flash'), 500);
-        clearAll();
-    }
-
+    function toggleDecimal() { isDecimalMode = !isDecimalMode; updateDisplay(); }
+    function toggleTheme() { document.body.classList.toggle('dark-theme'); document.getElementById('btn-theme').innerText = document.body.classList.contains('dark-theme') ? "🌙" : "☀️"; }
     function renderFraction(w, n, d, s) {
         let wholeStr = (s === -1 ? '-' : '');
         if (w !== '0' || (n === '' && d === '')) wholeStr += w; else if (s === -1) wholeStr = '-';
@@ -233,15 +213,13 @@
         if (n !== '' || d !== '') html += `<div class="fraction-part"><div class="num-part">${n || '0'}</div><div class="den-part">${d || '?'}</div></div>`;
         return html;
     }
-
     function press(part, val) { if (justSolved) { clearAll(); justSolved = false; } if (currentInput[part] === '0') currentInput[part] = val.toString(); else currentInput[part] += val.toString(); updateDisplay(); }
     function back(part) { if (justSolved) { clearAll(); justSolved = false; return; } currentInput[part] = currentInput[part].slice(0, -1); if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); updateDisplay(); }
     function toggleSign() { if (justSolved) justSolved = false; sign *= -1; updateDisplay(); }
     function clearAll() { currentInput = { w: '0', n: '', d: '' }; storedValue = null; storedDisplayHTML = ""; activeOperator = null; sign = 1; justSolved = false; document.getElementById('process-val').innerHTML = ""; updateDisplay(); document.getElementById('round-8').innerText = "-"; document.getElementById('round-16').innerText = "-"; document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op')); }
 
-    function updateDisplay(htmlOverride = null) { 
+    function updateDisplay() { 
         const main = document.getElementById('main-val'); 
-        if (htmlOverride) { main.innerHTML = htmlOverride; return; } 
         if (isDecimalMode) {
             let decimalVal = (parseInt(currentInput.w) + (parseInt(currentInput.n || 0) / parseInt(currentInput.d || 1))) * sign;
             main.innerHTML = `<div class="whole-part">${decimalVal.toFixed(4).replace(/\.?0+$/, '')}</div>`;
@@ -251,19 +229,11 @@
     }
 
     function handleOp(op) {
-        if (storedValue !== null && (currentInput.w === '0' && currentInput.n === '' && currentInput.d === '')) {
-            activeOperator = op;
-            let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
-            document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span>`;
-            document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
-            document.getElementById('op-' + (op==='+'?'plus':op==='-'?'minus':op==='*'?'mul':'div')).classList.add('active-op');
-            return;
-        }
         storedValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
         storedDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
-        activeOperator = op; justSolved = false;
+        activeOperator = op;
         let opChar = op === '*' ? '×' : op === '/' ? '÷' : op === '-' ? '−' : '+';
-        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span>`;
+        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} ${opChar}`;
         currentInput = { w: '0', n: '', d: '' }; sign = 1; updateDisplay();
         document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
         document.getElementById('op-' + (op==='+'?'plus':op==='-'?'minus':op==='*'?'mul':'div')).classList.add('active-op');
@@ -281,17 +251,12 @@
         else if (activeOperator === '*') { resNum = storedValue.num * secondValue.num; resDen = storedValue.den * secondValue.den; }
         else if (activeOperator === '/') { resNum = storedValue.num * secondValue.den; resDen = storedValue.den * secondValue.num; }
 
-        if (resDen === 0) { showError(); return; }
-        
-        let originalResNum = resNum, originalResDen = resDen;
         let common = gcd(Math.abs(resNum), Math.abs(resDen));
         resNum /= common; resDen /= common;
-
         let ent = Math.trunc(resNum / resDen), rem = Math.abs(resNum % resDen);
-        let opChar = activeOperator === '*' ? '×' : activeOperator === '/' ? '÷' : activeOperator === '-' ? '−' : '+';
-        document.getElementById('process-val').innerHTML = `${storedDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">${opChar}</span> ${secondDisplayHTML} <span style="font-size:1.5rem; margin:0 8px">=</span>`;
         
-        let decimal = originalResNum / originalResDen;
+        document.getElementById('process-val').innerHTML = "";
+        let decimal = resNum / resDen;
         document.getElementById('round-8').innerText = formatAprox(decimal, 8);
         document.getElementById('round-16').innerText = formatAprox(decimal, 16);
         
