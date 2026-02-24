@@ -28,7 +28,7 @@
             margin: 0; 
             display: flex; 
             justify-content: center; 
-            align-items: flex-start; /* Alineación al tope superior */
+            align-items: flex-start; 
             height: 100vh; 
             font-family: Arial, sans-serif; 
             overflow: hidden; 
@@ -41,11 +41,11 @@
             max-width: var(--max-calc-width);
             background: #bdc3c7 linear-gradient(135deg, #eee 25%, transparent 25%) -50px 0; 
             background-size: 2px 2px; 
-            border-radius: 0 0 12px 12px; /* Redondeado solo abajo para que pegue arriba */
+            border-radius: 0 0 12px 12px; 
             padding-bottom: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
             border: 1px solid #777; 
-            border-top: none; /* Quita borde superior para integración total */
+            border-top: none; 
             transition: background 0.3s;
             display: flex;
             flex-direction: column;
@@ -206,6 +206,7 @@
 
     function toggleDecimal() { isDecimalMode = !isDecimalMode; updateDisplay(); }
     function toggleTheme() { document.body.classList.toggle('dark-theme'); document.getElementById('btn-theme').innerText = document.body.classList.contains('dark-theme') ? "🌙" : "☀️"; }
+    
     function renderFraction(w, n, d, s) {
         let wholeStr = (s === -1 ? '-' : '');
         if (w !== '0' || (n === '' && d === '')) wholeStr += w; else if (s === -1) wholeStr = '-';
@@ -213,10 +214,25 @@
         if (n !== '' || d !== '') html += `<div class="fraction-part"><div class="num-part">${n || '0'}</div><div class="den-part">${d || '?'}</div></div>`;
         return html;
     }
-    function press(part, val) { if (justSolved) { clearAll(); justSolved = false; } if (currentInput[part] === '0') currentInput[part] = val.toString(); else currentInput[part] += val.toString(); updateDisplay(); }
-    function back(part) { if (justSolved) { clearAll(); justSolved = false; return; } currentInput[part] = currentInput[part].slice(0, -1); if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); updateDisplay(); }
+
+    function press(part, val) { 
+        if (justSolved) { clearAll(); justSolved = false; } 
+        if (currentInput[part] === '0') currentInput[part] = val.toString(); else currentInput[part] += val.toString(); updateDisplay(); 
+    }
+
+    function back(part) { 
+        if (justSolved) { clearAll(); justSolved = false; return; } 
+        currentInput[part] = currentInput[part].slice(0, -1); if (currentInput[part] === '') currentInput[part] = (part === 'w' ? '0' : ''); updateDisplay(); 
+    }
+
     function toggleSign() { if (justSolved) justSolved = false; sign *= -1; updateDisplay(); }
-    function clearAll() { currentInput = { w: '0', n: '', d: '' }; storedValue = null; storedDisplayHTML = ""; activeOperator = null; sign = 1; justSolved = false; document.getElementById('process-val').innerHTML = ""; updateDisplay(); document.getElementById('round-8').innerText = "-"; document.getElementById('round-16').innerText = "-"; document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op')); }
+
+    function clearAll() { 
+        currentInput = { w: '0', n: '', d: '' }; storedValue = null; storedDisplayHTML = ""; activeOperator = null; sign = 1; justSolved = false; 
+        document.getElementById('process-val').innerHTML = ""; updateDisplay(); 
+        document.getElementById('round-8').innerText = "-"; document.getElementById('round-16').innerText = "-"; 
+        document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op')); 
+    }
 
     function updateDisplay() { 
         const main = document.getElementById('main-val'); 
@@ -229,6 +245,11 @@
     }
 
     function handleOp(op) {
+        // Lógica de encadenamiento: si acaba de resolverse, usar el valor actual como base
+        if (justSolved) {
+            justSolved = false;
+        }
+        
         storedValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
         storedDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
         activeOperator = op;
@@ -244,12 +265,14 @@
     function solve() {
         if (!storedValue || !activeOperator) return;
         let secondValue = { num: (parseInt(currentInput.w) * (parseInt(currentInput.d) || 1) + (parseInt(currentInput.n) || 0)) * sign, den: parseInt(currentInput.d) || 1 };
-        let secondDisplayHTML = renderFraction(currentInput.w, currentInput.n, currentInput.d, sign);
         let resNum, resDen;
+        
         if (activeOperator === '+') { resNum = storedValue.num * secondValue.den + secondValue.num * storedValue.den; resDen = storedValue.den * secondValue.den; }
         else if (activeOperator === '-') { resNum = storedValue.num * secondValue.den - secondValue.num * storedValue.den; resDen = storedValue.den * secondValue.den; }
         else if (activeOperator === '*') { resNum = storedValue.num * secondValue.num; resDen = storedValue.den * secondValue.den; }
         else if (activeOperator === '/') { resNum = storedValue.num * secondValue.den; resDen = storedValue.den * secondValue.num; }
+
+        if (resDen === 0) return;
 
         let common = gcd(Math.abs(resNum), Math.abs(resDen));
         resNum /= common; resDen /= common;
@@ -260,8 +283,13 @@
         document.getElementById('round-8').innerText = formatAprox(decimal, 8);
         document.getElementById('round-16').innerText = formatAprox(decimal, 16);
         
+        // Actualizar variables con el resultado para permitir encadenamiento
         currentInput = { w: Math.abs(ent).toString(), n: rem !== 0 ? rem.toString() : '', d: rem !== 0 ? resDen.toString() : '' };
-        sign = (resNum < 0) ? -1 : 1; justSolved = true; storedValue = null; activeOperator = null;
+        sign = (resNum < 0) ? -1 : 1; 
+        justSolved = true; 
+        storedValue = null; 
+        activeOperator = null;
+        
         updateDisplay();
         document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active-op'));
     }
